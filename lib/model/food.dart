@@ -4,6 +4,7 @@ class Food {
   final String description;
   final String imageUrl;
   final double price;
+  final int qty;
 
   Food({
     required this.id,
@@ -11,6 +12,7 @@ class Food {
     required this.description,
     required this.imageUrl,
     required this.price,
+    this.qty = 0,
   });
 
   factory Food.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Food {
       description: json['description'] ?? '',
       imageUrl: json['imageUrl'] ?? '',
       price: json['price'] ?? '',
+      qty: json['qty'] ?? 0,
     );
   }
 
@@ -30,6 +33,7 @@ class Food {
       'description' : description,
       'price' : price,
       'imageUrl':imageUrl,
+      'qty': qty,
     };
   }
 }
