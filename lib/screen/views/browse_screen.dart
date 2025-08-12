@@ -14,6 +14,7 @@ class BrowseScreen extends StatefulWidget {
 
 class _BrowseScreenState extends State<BrowseScreen> {
   List<Food> _foods = [];
+  List<Food> _filteredFoods = [];
   bool _isLoading = true;
 
   @override
@@ -24,10 +25,23 @@ class _BrowseScreenState extends State<BrowseScreen> {
 
   Future<void> _loadFoods() async {
     final db = DatabaseHelper.instance;
-    final foods = await db.getAllFoods(); // This method should return List<Food>
+    final foods = await db.getAllFoods();
     setState(() {
       _foods = foods;
+      _filteredFoods = foods; // Initially, show all foods
       _isLoading = false;
+    });
+  }
+
+  void _filterFoods(String query) {
+    final filtered = _foods.where((food) {
+      final nameLower = food.name.toLowerCase();
+      final searchLower = query.toLowerCase();
+      return nameLower.contains(searchLower);
+    }).toList();
+
+    setState(() {
+      _filteredFoods = filtered;
     });
   }
 
@@ -62,9 +76,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
               elevation: const WidgetStatePropertyAll(0),
               backgroundColor: const WidgetStatePropertyAll(Colors.white),
               hintText: 'Search for food',
-              onChanged: (value) {
-                // Optional: implement search filtering
-              },
+              onChanged: _filterFoods, // Call filter function
               padding: WidgetStateProperty.all(
                 const EdgeInsets.symmetric(horizontal: 16.0),
               ),
@@ -73,26 +85,32 @@ class _BrowseScreenState extends State<BrowseScreen> {
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : GridView(
-                    padding: const EdgeInsets.all(8.0),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.9,
-                      crossAxisSpacing: 8.0,
-                      mainAxisSpacing: 8.0,
-                    ),
-                    children: _foods.map((food) => FoodCard(
-                      foodItem: food,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FoodDetail(food: food),
-                          ),
-                        );
-                      },
-                    )).toList(),
-                )
+                : _filteredFoods.isEmpty
+                    ? const Center(child: Text("No food found"))
+                    : GridView.builder(
+                        padding: const EdgeInsets.all(8.0),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.9,
+                          crossAxisSpacing: 8.0,
+                          mainAxisSpacing: 8.0,
+                        ),
+                        itemCount: _filteredFoods.length,
+                        itemBuilder: (context, index) {
+                          final food = _filteredFoods[index];
+                          return FoodCard(
+                            foodItem: food,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => FoodDetail(food: food),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
           ),
         ],
       ),

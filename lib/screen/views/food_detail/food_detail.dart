@@ -117,7 +117,7 @@ class _FoodDetailState extends State<FoodDetail> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      "$quantity",
+                      "${widget.food.qty + quantity}",
                       style: const TextStyle(fontSize: 20),
                     ),
                   ),
@@ -152,7 +152,7 @@ class _FoodDetailState extends State<FoodDetail> {
                     // TODO: Add the food item and quantity to the cart
                     // For now, show a confirmation message
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Added to cart ${widget.food.name} $quantity item(s)')),
+                      SnackBar(content: Text('Added to cart ${widget.food.name} ${widget.food.qty} item(s)')),
                     );
                   },
                   icon: const Icon(
